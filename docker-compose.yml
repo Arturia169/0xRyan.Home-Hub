@@ -46,6 +46,8 @@ services:
       - cyber-backbone
     environment:
       - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
+      - TUNNEL_HTTP_PROXY=http://192.168.5.100:7890
+      - TUNNEL_TRANSPORT_PROTOCOL=http2
     command: tunnel --no-autoupdate run --protocol http2
 
 networks:
