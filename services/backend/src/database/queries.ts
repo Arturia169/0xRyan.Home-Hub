@@ -389,20 +389,26 @@ export function removeCustomToken(chain: string, symbol: string): boolean {
  * 添加监控主播
  */
 export function addBilibiliStreamer(
-  userId: number,
+  telegramId: number,
   roomId: string,
   uid?: string,
   name?: string
 ): BilibiliStreamer {
   const db = getDatabase();
 
+  // 先通过 telegram_id 获取真实的 user.id
+  const user = db.prepare('SELECT id FROM users WHERE telegram_id = ?').get(telegramId) as { id: number } | undefined;
+  if (!user) {
+    throw new Error('用户不存在，请先发送 /start 初始化');
+  }
+
   // 如果该用户已关注该房间，则先删除旧记录
-  db.prepare('DELETE FROM bilibili_streamers WHERE user_id = ? AND room_id = ?').run(userId, roomId);
+  db.prepare('DELETE FROM bilibili_streamers WHERE user_id = ? AND room_id = ?').run(user.id, roomId);
 
   const result = db.prepare(`
         INSERT INTO bilibili_streamers (user_id, room_id, uid, name)
         VALUES (?, ?, ?, ?)
-    `).run(userId, roomId, uid || null, name || null);
+    `).run(user.id, roomId, uid || null, name || null);
 
   return db.prepare('SELECT * FROM bilibili_streamers WHERE id = ?').get(result.lastInsertRowid) as BilibiliStreamer;
 }
@@ -462,15 +468,22 @@ import type { YoutubeChannel } from './models.js';
  * 添加 YouTube 订阅
  */
 export function addYoutubeChannel(
-  userId: number,
+  telegramId: number,
   channelId: string,
   name?: string
 ): YoutubeChannel {
   const db = getDatabase();
+
+  // 先通过 telegram_id 获取真实的 user.id
+  const user = db.prepare('SELECT id FROM users WHERE telegram_id = ?').get(telegramId) as { id: number } | undefined;
+  if (!user) {
+    throw new Error('用户不存在，请先发送 /start 初始化');
+  }
+
   const result = db.prepare(`
         INSERT INTO youtube_channels (user_id, channel_id, name)
         VALUES (?, ?, ?)
-    `).run(userId, channelId, name || null);
+    `).run(user.id, channelId, name || null);
   return db.prepare('SELECT * FROM youtube_channels WHERE id = ?').get(result.lastInsertRowid) as YoutubeChannel;
 }
 
@@ -519,15 +532,22 @@ import type { TwitterUser } from './models.js';
  * 添加 Twitter 订阅
  */
 export function addTwitterUser(
-  userId: number,
+  telegramId: number,
   username: string,
   name?: string
 ): TwitterUser {
   const db = getDatabase();
+
+  // 先通过 telegram_id 获取真实的 user.id
+  const user = db.prepare('SELECT id FROM users WHERE telegram_id = ?').get(telegramId) as { id: number } | undefined;
+  if (!user) {
+    throw new Error('用户不存在，请先发送 /start 初始化');
+  }
+
   const result = db.prepare(`
         INSERT INTO twitter_users (user_id, username, name)
         VALUES (?, ?, ?)
-    `).run(userId, username, name || null);
+    `).run(user.id, username, name || null);
   return db.prepare('SELECT * FROM twitter_users WHERE id = ?').get(result.lastInsertRowid) as TwitterUser;
 }
 
