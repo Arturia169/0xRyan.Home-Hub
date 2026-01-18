@@ -1,7 +1,3 @@
-/**
- * Bilibili 相关命令
- */
-
 import type { Context } from 'grammy';
 import { pluginManager } from '../../core/PluginManager.js';
 import { getOrCreateUser } from '../../database/queries.js';
@@ -59,36 +55,4 @@ export async function removeBili(ctx: Context) {
     }
 }
 
-/**
- * 列出已监控的主播
- * /listbili
- */
-export async function listBili(ctx: Context) {
-    const user = ctx.from!;
-    const dbUser = getOrCreateUser(user.id, user.username, user.first_name);
 
-    const streamers = getBilibiliStreamersByUser(dbUser.id);
-
-    if (streamers.length === 0) {
-        await ctx.reply('📭 你还没有监控任何 Bilibili 直播间\n使用 `/addbili 房间号` 添加');
-        return;
-    }
-
-    let message = '📺 <b>你的 Bilibili 监控列表</b>\n\n';
-
-    for (const s of streamers) {
-        const status = s.is_live === 1 ? '🟢 直播中' : '⚫ 未开播';
-        const link = `<a href="https://live.bilibili.com/${s.room_id}">${s.room_id}</a>`;
-
-        message += `${status} - 房间: ${link}\n`;
-        if (s.last_title) {
-            message += `📝 ${s.last_title}\n`;
-        }
-        message += '\n';
-    }
-
-    await ctx.reply(message, {
-        parse_mode: 'HTML',
-        link_preview_options: { is_disabled: true }
-    });
-}

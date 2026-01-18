@@ -1,14 +1,10 @@
-/**
- * 统一的订阅列表命令
- */
-
-
 import {
     getAllYoutubeChannels,
     getAllTwitterUsers
 } from '../../database/queries.js';
 import { pluginManager } from '../../core/PluginManager.js';
 import { Subscription } from '../../core/types.js';
+import { Context } from 'grammy';
 
 export async function listAll(ctx: Context) {
     const userId = ctx.from!.id;

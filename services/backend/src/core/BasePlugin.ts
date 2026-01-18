@@ -7,8 +7,8 @@ import { SourcePlugin, Subscription } from './types.js';
 import { logger } from '../utils/logger.js';
 import { sendMessage, sendPhoto } from '../services/notification.js';
 import { getDatabase } from '../database/index.js';
-
 import { setTimeout, setInterval, clearInterval } from 'node:timers';
+import type { Database } from 'better-sqlite3';
 
 export abstract class BasePlugin implements SourcePlugin {
     abstract name: string;
@@ -76,7 +76,7 @@ export abstract class BasePlugin implements SourcePlugin {
     }
 
     // 数据库辅助方法
-    protected get db() {
+    protected get db(): Database {
         return getDatabase();
     }
 }
