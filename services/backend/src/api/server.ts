@@ -76,9 +76,8 @@ export async function startServer() {
                 log.info(`获取用户 ${userId} 的 Dashboard 数据`);
                 const data = await getUserDashboardData(userId);
                 log.info('Dashboard 数据:', {
-                    totalUsd: data.totalUsd,
-                    assetsCount: data.assets.length,
-                    bilibiliCount: data.bilibili.length
+                    intelligenceCount: data.intelligence.length,
+                    bilibiliCount: data.bilibili?.length || 0
                 });
                 return data;
             } catch (error: any) {
