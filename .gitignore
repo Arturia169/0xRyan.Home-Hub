@@ -1,0 +1,40 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Build output
+dist/
+build/
+out/
+.next/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+logs/
+*.log
+
+# Database
+data/
+*.sqlite
+*.db
