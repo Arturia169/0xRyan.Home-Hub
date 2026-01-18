@@ -72,9 +72,7 @@ menuHandler.hears('❓ 帮助', async (ctx) => {
     // 我们在这里处理掉吧。
 
     // 手动触发 help 命令逻辑比较麻烦，直接回复
-    await ctx.reply('📖 请发送 /help 查看详细命令列表。', {
-        reply_markup: { remove_keyboard: false } // 保持键盘
-    });
+    await ctx.reply('📖 请发送 /help 查看详细命令列表。');
 });
 
 export { menuHandler };

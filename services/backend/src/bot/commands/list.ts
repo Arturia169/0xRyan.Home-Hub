@@ -21,6 +21,7 @@ export async function listAll(ctx: Context) {
     let ytSubsCount = 0;
     let twSubsCount = 0;
     let rssSubsCount = 0;
+    let ghSubsCount = 0;
 
     try {
         const ytPlugin = pluginManager.get('youtube');
@@ -33,12 +34,12 @@ export async function listAll(ctx: Context) {
     } catch { }
 
     try {
-        const rssPlugin = pluginManager.get('rss');
-        if (rssPlugin) rssSubsCount = (await rssPlugin.getSubscriptions(userId)).length;
+        const ghPlugin = pluginManager.get('github');
+        if (ghPlugin) ghSubsCount = (await ghPlugin.getSubscriptions(userId)).length;
     } catch { }
 
-    if (biliSubsCount === 0 && ytSubsCount === 0 && twSubsCount === 0 && rssSubsCount === 0) {
-        await ctx.reply('📭 你还没有任何订阅\n\n使用以下命令添加订阅：\n/addbili - B站直播\n/addyt - YouTube频道\n/addtw - Twitter用户\n/addrss - RSS订阅');
+    if (biliSubsCount === 0 && ytSubsCount === 0 && twSubsCount === 0 && rssSubsCount === 0 && ghSubsCount === 0) {
+        await ctx.reply('📭 你还没有任何订阅\n\n使用以下命令添加订阅：\n/addbili - B站直播\n/addyt - YouTube频道\n/addtw - Twitter用户\n/addrss - RSS订阅\n/addgh - GitHub仓库');
         return;
     }
 
@@ -99,6 +100,21 @@ export async function listAll(ctx: Context) {
                 twUsers.forEach((u, index) => {
                     message += `${index + 1}. ${u.name || u.targetId}\n`;
                     message += `   Handle: <code>${u.targetId}</code>\n`;
+                });
+                message += '\n';
+            }
+        }
+    } catch (e) { console.error(e); }
+
+    // GitHub
+    try {
+        const ghPlugin = pluginManager.get('github');
+        if (ghPlugin) {
+            const ghRepos = await ghPlugin.getSubscriptions(userId);
+            if (ghRepos.length > 0) {
+                message += '🐙 <b>GitHub 仓库 (' + ghRepos.length + ')</b>\n';
+                ghRepos.forEach((r, index) => {
+                    message += `${index + 1}. ${r.targetId}\n`;
                 });
                 message += '\n';
             }
