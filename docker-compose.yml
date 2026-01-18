@@ -39,6 +39,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      - DOCKER_API_VERSION=1.44 # 强制使用兼容的 API 版本
       - WATCHTOWER_CLEANUP=true # 自动清理旧镜像
       - WATCHTOWER_POLL_INTERVAL=3600 # 每1小时检查一次 (单位:秒)
       - WATCHTOWER_INCLUDE_STOPPED=true

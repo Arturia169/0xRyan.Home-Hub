@@ -1,66 +1,44 @@
-import { InlineKeyboard } from 'grammy';
-import config from '../config/index.js';
-
 /**
- * 创建确认键盘
+ * 键盘布局定义
  */
-export function confirmKeyboard(
-    confirmCallback: string,
-    cancelCallback: string = 'cancel'
-): InlineKeyboard {
-    return new InlineKeyboard()
-        .text('✅ 确认', confirmCallback)
-        .text('❌ 取消', cancelCallback);
-}
+import { Keyboard, InlineKeyboard } from 'grammy';
 
-/**
- * 创建返回主菜单键盘
- */
-export function backToMenuKeyboard(): InlineKeyboard {
-    return new InlineKeyboard().text('🏠 返回主菜单', 'menu:main');
-}
+// ==================== 主菜单 (Reply Keyboard) ====================
 
-/**
- * 创建主菜单键盘
- */
-export function mainMenuKeyboard(): InlineKeyboard {
-    const webAppUrl = config.telegram.webappUrl || 'https://t.me';
-    const keyboard = new InlineKeyboard();
+// 底部常驻菜单
+export const mainMenu = new Keyboard()
+    .text('📺 B站直播').text('🎬 YouTube').row()
+    .text('🐦 Twitter').text('🐙 GitHub').row()
+    .text('👤 个人中心').text('❓ 帮助')
+    .resized() // 自动调整大小
+    .persistent(); // 总是显示
 
-    // 控制面板 (Web App)
-    if (webAppUrl.startsWith('https://')) {
-        keyboard.webApp('💎 赛博控制面板', webAppUrl);
-    } else {
-        keyboard.url('💎 赛博控制面板 (浏览器)', webAppUrl);
-    }
+// ==================== 子菜单 (Inline Keyboard) ====================
 
-    return keyboard
-        .row()
-        .text('📺 添加 B站 监控', 'menu:add')
-        .text('📋 监控列表', 'menu:list')
-        .row()
-        .text('ℹ️ 帮助', 'menu:help');
-}
+// 通用返回按钮
+const backBtn = { text: '🔙 返回主菜单', callback_data: 'menu_main' };
 
-/**
- * 创建分页键盘
- */
-export function paginationKeyboard(
-    currentPage: number,
-    totalPages: number,
-    callbackPrefix: string
-): InlineKeyboard {
-    const keyboard = new InlineKeyboard();
+// B站菜单
+export const biliMenu = new InlineKeyboard()
+    .text('➕ 新增订阅', 'add_bili_guide').text('📋 我的列表', 'list_bili').row()
+    .url('🔗 前往 Bilibili', 'https://www.bilibili.com');
 
-    if (currentPage > 1) {
-        keyboard.text('⬅️ 上一页', `${callbackPrefix}:${currentPage - 1}`);
-    }
+// YouTube 菜单
+export const ytMenu = new InlineKeyboard()
+    .text('➕ 新增订阅', 'add_yt_guide').text('📋 我的列表', 'list_yt').row()
+    .url('🔗 前往 YouTube', 'https://www.youtube.com');
 
-    keyboard.text(`${currentPage}/${totalPages}`, 'noop');
+// Twitter 菜单
+export const twMenu = new InlineKeyboard()
+    .text('➕ 新增订阅', 'add_tw_guide').text('📋 我的列表', 'list_tw').row()
+    .url('🔗 前往 Twitter', 'https://twitter.com');
 
-    if (currentPage < totalPages) {
-        keyboard.text('➡️ 下一页', `${callbackPrefix}:${currentPage + 1}`);
-    }
+// GitHub 菜单
+export const ghMenu = new InlineKeyboard()
+    .text('➕ 新增订阅', 'add_gh_guide').text('📋 我的列表', 'list_gh').row()
+    .url('🔗 前往 GitHub', 'https://github.com');
 
-    return keyboard;
-}
+// 个人中心菜单
+export const userMenu = new InlineKeyboard()
+    .text('📋 所有订阅', 'list_all').text('⚙️ 设置 (开发中)', 'settings').row()
+    .text('🗑️ 清除菜单', 'close_menu');

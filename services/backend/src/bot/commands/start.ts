@@ -4,7 +4,7 @@
  */
 
 import { Composer, Context } from 'grammy';
-import { mainMenuKeyboard } from '../keyboards.js';
+import { mainMenu } from '../keyboards.js';
 import { getOrCreateUser } from '../../database/queries.js';
 
 const composer = new Composer();
@@ -35,7 +35,8 @@ composer.command('start', async (ctx: Context) => {
   `;
 
   await ctx.reply(welcomeMessage, {
-    parse_mode: 'HTML'
+    parse_mode: 'HTML',
+    reply_markup: mainMenu
   });
 });
 

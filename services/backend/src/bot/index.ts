@@ -16,6 +16,8 @@ import { listAll } from './commands/list.js';
 import { listUsers, setRole } from './commands/admin/index.js';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { pluginManager } from '../core/PluginManager.js';
+import { menuHandler } from './handlers/menu.js';
+import { callbackHandler } from './handlers/callback.js';
 
 const log = logger.child('Bot');
 
@@ -99,6 +101,11 @@ export function createBot(): Bot {
 
     // 注册命令处理器
     bot.use(startCommand);
+
+    // 菜单处理器 (放在命令之前，或之后？command 优先级高。这里 hears 是 text 匹配，应该互不冲突)
+    // 但通常建议具体匹配在前，通用在后。
+    bot.use(menuHandler);
+    bot.use(callbackHandler);
 
     // Bilibili 命令
     bot.command('addbili', addBili);
