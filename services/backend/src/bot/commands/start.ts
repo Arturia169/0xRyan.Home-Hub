@@ -17,7 +17,7 @@ composer.command('start', async (ctx: Context) => {
   getOrCreateUser(user.id, user.username, user.first_name);
 
   const welcomeMessage = `
-🤖 <b>欢迎来到赛博基地情报中心！</b>
+🤖 <b>欢迎来到 0xRyan.Home.Hub！</b>
 
 我是你的全源情报助手，实时监控 B站、YouTube、Twitter 等平台的关键动态。
 

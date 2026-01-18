@@ -1,4 +1,6 @@
-# 🤖 Cyber Base Hub - 赛博基地情报中心
+# 🤖 0xRyan.Home.Hub - 智能情报中枢
+
+**0xRyan.Home.Hub** 是一个全源情报聚合与自动化监控系统，旨在将社交媒体、视频平台和 RSS 订阅转化为即时的 Telegram 情报推送。
 
 <div align="center">
 

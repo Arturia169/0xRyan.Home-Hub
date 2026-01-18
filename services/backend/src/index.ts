@@ -15,7 +15,7 @@ const log = logger.child('Main');
  */
 async function main() {
     log.info('====================================');
-    log.info('  赛博基地情报中心启动中...');
+    log.info('  0xRyan.Home.Hub 启动中...');
     log.info('  功能: B站/YouTube/社媒情报监听');
     log.info('====================================');
 

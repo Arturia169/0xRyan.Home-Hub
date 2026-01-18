@@ -1,7 +1,7 @@
 {
-    "name": "cyber-base-core",
-    "version": "2.0.0",
-    "description": "赛博基地情报中心 - B站/YouTube/社媒情报聚合与推送",
+    "name": "0xryan-home-hub-core",
+    "version": "3.0.0",
+    "description": "0xRyan.Home.Hub - 全源情报聚合与推送核心",
     "main": "dist/index.js",
     "type": "module",
     "scripts": {
