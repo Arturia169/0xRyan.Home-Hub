@@ -78,6 +78,27 @@ export class YoutubePlugin extends BasePlugin {
         }));
     }
 
+    /**
+     * 主动获取某个频道最新的视频并通知用户
+     */
+    async fetchAndNotifyLatest(userId: number, channelId: string): Promise<boolean> {
+        try {
+            const feedUrl = `${YOUTUBE_RSS_BASE}${channelId}`;
+            const feed = await this.parser.parseURL(feedUrl);
+
+            if (!feed.items || feed.items.length === 0) return false;
+
+            const latestVideo = feed.items[0] as YoutubeFeedItem;
+            const videoId = latestVideo.id.replace('yt:video:', '');
+
+            await this.sendNotification(userId, latestVideo, videoId);
+            return true;
+        } catch (error: any) {
+            this.log.error(`获取频道最新动态失败 (${channelId}):`, error.message);
+            return false;
+        }
+    }
+
     protected async checkUpdates(): Promise<void> {
         const channels = getAllYoutubeChannels();
         if (channels.length === 0) return;

@@ -75,4 +75,10 @@ menuHandler.hears('❓ 帮助', async (ctx) => {
     await ctx.reply('📖 请发送 /help 查看详细命令列表。');
 });
 
+// 响应回到主菜单的按钮 (清除 Inline 菜单并提示)
+menuHandler.callbackQuery('menu_main', async (ctx) => {
+    await ctx.answerCallbackQuery();
+    await ctx.editMessageText('🏠 已返回主菜单。请使用下方的常驻键盘进行操作。');
+});
+
 export { menuHandler };
