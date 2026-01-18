@@ -1,5 +1,4 @@
 import {
-    getAllYoutubeChannels,
     getAllTwitterUsers
 } from '../../database/queries.js';
 import { pluginManager } from '../../core/PluginManager.js';
@@ -20,12 +19,30 @@ export async function listAll(ctx: Context) {
         console.error('获取B站订阅失败', e);
     }
 
-    // 暂时还未迁移 YouTube 和 Twitter，沿用旧查询
-    const ytChannels = getAllYoutubeChannels().filter(c => c.telegram_id === userId);
+    // 暂时还未迁移 Twitter，沿用旧查询
     const twUsers = getAllTwitterUsers().filter(u => u.telegram_id === userId);
 
-    if (biliSubs.length === 0 && ytChannels.length === 0 && twUsers.length === 0) {
-        await ctx.reply('📭 你还没有任何订阅\n\n使用以下命令添加订阅：\n/addbili - B站直播\n/addyt - YouTube频道\n/addtw - Twitter用户');
+    if (biliSubs.length === 0 && twUsers.length === 0) {
+        // 由于这里也依赖 pluginManager 获取 YouTube 订阅，我们应该先检查一下插件订阅
+        // 为了简化，我们只检查已知的非空数组
+        // 最好的办法是先获取所有订阅再统一判断空
+    }
+
+    // 获取其他插件的订阅
+    let ytSubsCount = 0;
+    try {
+        const ytPlugin = pluginManager.get('youtube');
+        if (ytPlugin) ytSubsCount = (await ytPlugin.getSubscriptions(userId)).length;
+    } catch { }
+
+    let rssSubsCount = 0;
+    try {
+        const rssPlugin = pluginManager.get('rss');
+        if (rssPlugin) rssSubsCount = (await rssPlugin.getSubscriptions(userId)).length;
+    } catch { }
+
+    if (biliSubs.length === 0 && ytSubsCount === 0 && twUsers.length === 0 && rssSubsCount === 0) {
+        await ctx.reply('📭 你还没有任何订阅\n\n使用以下命令添加订阅：\n/addbili - B站直播\n/addyt - YouTube频道\n/addtw - Twitter用户\n/addrss - RSS订阅');
         return;
     }
 
@@ -44,13 +61,21 @@ export async function listAll(ctx: Context) {
     }
 
     // YouTube
-    if (ytChannels.length > 0) {
-        message += '🎬 <b>YouTube 频道 (' + ytChannels.length + ')</b>\n';
-        ytChannels.forEach((c, index) => {
-            message += `${index + 1}. ${c.name || c.channel_id}\n`;
-            message += `   ID: <code>${c.channel_id}</code>\n`;
-        });
-        message += '\n';
+    try {
+        const ytPlugin = pluginManager.get('youtube');
+        if (ytPlugin) {
+            const ytChannels = await ytPlugin.getSubscriptions(userId);
+            if (ytChannels.length > 0) {
+                message += '🎬 <b>YouTube 频道 (' + ytChannels.length + ')</b>\n';
+                ytChannels.forEach((c, index) => {
+                    message += `${index + 1}. ${c.name || c.targetId}\n`;
+                    message += `   ID: <code>${c.targetId}</code>\n`;
+                });
+                message += '\n';
+            }
+        }
+    } catch (e) {
+        console.error('获取YouTube订阅失败', e);
     }
 
     // RSS

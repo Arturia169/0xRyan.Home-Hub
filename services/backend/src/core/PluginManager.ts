@@ -7,6 +7,7 @@ import { logger } from '../utils/logger.js';
 import { Context } from 'grammy';
 import { BilibiliPlugin } from '../plugins/bilibili/index.js';
 import { GeneralRssPlugin } from '../plugins/general-rss/index.js';
+import { YoutubePlugin } from '../plugins/youtube/index.js';
 
 const log = logger.child('Core:PluginManager');
 
@@ -17,6 +18,7 @@ export class PluginManager {
         // 在这里注册所有内置插件
         this.register(new BilibiliPlugin());
         this.register(new GeneralRssPlugin());
+        this.register(new YoutubePlugin());
     }
 
     // 注册插件

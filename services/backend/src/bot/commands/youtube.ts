@@ -3,12 +3,7 @@
  */
 
 import { Context } from 'grammy';
-import {
-    addYoutubeChannel,
-    removeYoutubeChannel,
-    getAllYoutubeChannels
-} from '../../database/queries.js';
-import { youtubeService } from '../../services/youtube.js';
+import { pluginManager } from '../../core/PluginManager.js';
 import { logger } from '../../utils/logger.js';
 
 const log = logger.child('Bot:YouTube');
@@ -31,6 +26,9 @@ export async function addYoutube(ctx: Context) {
     const userId = ctx.from!.id;
 
     try {
+        const plugin = pluginManager.get('youtube');
+        if (!plugin) return ctx.reply('❌ 插件未加载');
+
         // 如果输入的是 @handle 格式，需要转换成真实的频道 ID
         let channelId = channelInput;
         let channelName = name || channelInput;
@@ -90,7 +88,7 @@ export async function addYoutube(ctx: Context) {
             }
         }
 
-        addYoutubeChannel(userId, channelId, channelName);
+        await plugin.addSubscription(userId, channelId, channelName);
         await ctx.reply(`✅ 成功订阅 YouTube 频道: <b>${channelName}</b>\nID: <code>${channelId}</code>`, { parse_mode: 'HTML' });
         log.info(`用户 ${userId} 添加 YouTube 订阅: ${channelId}`);
 
@@ -115,7 +113,10 @@ export async function removeYoutube(ctx: Context) {
     const userId = ctx.from!.id;
 
     try {
-        const success = removeYoutubeChannel(userId, channelId);
+        const plugin = pluginManager.get('youtube');
+        if (!plugin) return ctx.reply('❌ 插件未加载');
+
+        const success = await plugin.removeSubscription(userId, channelId);
         if (success) {
             await ctx.reply(`🗑️ 已取消订阅 YouTube 频道: ${channelId}`);
         } else {
@@ -127,24 +128,29 @@ export async function removeYoutube(ctx: Context) {
 }
 
 /**
- * 列出所有订阅
+ * 列出所有订阅 (保留用于单独命令，虽然已有 /list)
  */
 export async function listYoutube(ctx: Context) {
     const userId = ctx.from!.id;
-    const channels = getAllYoutubeChannels().filter(c => c.telegram_id === userId); // 注意: getAllYoutubeChannels 返回的是所有用户的，需要过滤
 
-    if (channels.length === 0) {
-        await ctx.reply('📭 你还没有订阅任何 YouTube 频道');
-        return;
-    }
+    try {
+        const plugin = pluginManager.get('youtube');
+        if (!plugin) return;
 
-    let message = '📺 <b>YouTube 订阅列表:</b>\n\n';
-    channels.forEach((c, index) => {
-        message += `${index + 1}. <b>${c.name || c.channel_id}</b>\n`;
-        message += `   ID: <code>${c.channel_id}</code>\n`;
-        // message += `   RSS: https://www.youtube.com/feeds/videos.xml?channel_id=${c.channel_id}\n\n`; // 保持简洁
-        message += '\n';
-    });
+        const channels = await plugin.getSubscriptions(userId);
 
-    await ctx.reply(message, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
+        if (channels.length === 0) {
+            await ctx.reply('📭 你还没有订阅任何 YouTube 频道');
+            return;
+        }
+
+        let message = '📺 <b>YouTube 订阅列表:</b>\n\n';
+        channels.forEach((c, index) => {
+            message += `${index + 1}. <b>${c.name || c.targetId}</b>\n`;
+            message += `   ID: <code>${c.targetId}</code>\n`;
+            message += '\n';
+        });
+
+        await ctx.reply(message, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
+    } catch (e) { console.error(e); }
 }

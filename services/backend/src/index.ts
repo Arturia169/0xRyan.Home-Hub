@@ -3,7 +3,7 @@ import { config, validateConfig } from './config/index.js';
 import { initDatabase, closeDatabase } from './database/index.js';
 import { startBot, stopBot } from './bot/index.js';
 import { startServer, stopServer } from './api/server.js';
-import { youtubeService } from './services/youtube.js';
+// import { youtubeService } from './services/youtube.js';
 import { twitterService } from './services/twitter.js';
 import { logger } from './utils/logger.js';
 import { pluginManager } from './core/PluginManager.js';
@@ -47,10 +47,10 @@ async function main() {
         log.info('   ✅ 插件系统已就绪');
 
         // 启动旧版监控服务 (逐步迁移中)
-        log.info('6. 启动旧版监控 (YouTube, Twitter)...');
-        youtubeService.start();
+        log.info('6. 启动旧版监控 (Twitter)...');
+        // youtubeService.start();
         twitterService.start();
-        log.info('   ✅ 监控服务已运行 (YouTube, Twitter)');
+        log.info('   ✅ 监控服务已运行 (Twitter)');
 
         log.info('====================================');
         log.info('  🤖 情报中心运行中');
@@ -71,7 +71,7 @@ async function shutdown() {
     try {
         // 停止监控服务
         pluginManager.stopAll();
-        youtubeService.stop();
+        // youtubeService.stop();
         twitterService.stop();
 
         // 停止 Bot
