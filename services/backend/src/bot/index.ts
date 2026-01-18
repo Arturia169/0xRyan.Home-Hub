@@ -10,6 +10,8 @@ import { setBotInstance } from '../services/notification.js';
 // 导入命令处理器
 import startCommand from './commands/start.js';
 import { addBili, removeBili, listBili } from './commands/bilibili.js';
+import { addYoutube, removeYoutube, listYoutube } from './commands/youtube.js';
+import { addTwitter, removeTwitter, listTwitter } from './commands/twitter.js';
 import { bilibiliService } from '../services/bilibili.js';
 
 // 导入键盘
@@ -89,6 +91,16 @@ export function createBot(): Bot {
     bot.command('removebili', removeBili);
     bot.command('listbili', listBili);
 
+    // YouTube 命令
+    bot.command('addyt', addYoutube);
+    bot.command('removeyt', removeYoutube);
+    bot.command('listyt', listYoutube);
+
+    // Twitter 命令
+    bot.command('addtw', addTwitter);
+    bot.command('removetw', removeTwitter);
+    bot.command('listtw', listTwitter);
+
     // 处理主菜单回调
     bot.callbackQuery('menu:main', async (ctx: Context) => {
         await ctx.editMessageText(
@@ -151,7 +163,10 @@ export async function startBot(): Promise<void> {
         { command: 'start', description: '开始使用 / 主菜单' },
         { command: 'addbili', description: '添加B站直播监控' },
         { command: 'listbili', description: '查看B站监控列表' },
-        { command: 'removebili', description: '移除B站监控' },
+        { command: 'addyt', description: '添加YouTube频道监控' },
+        { command: 'listyt', description: '查看YouTube监控列表' },
+        { command: 'addtw', description: '添加Twitter用户监控' },
+        { command: 'listtw', description: '查看Twitter监控列表' },
         { command: 'help', description: '帮助信息' },
     ]);
 
