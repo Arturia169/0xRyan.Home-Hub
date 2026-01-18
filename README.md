@@ -77,8 +77,8 @@ graph TB
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/Arturia169/0xRyan.Base-Hub.git
-cd 0xRyan.Base-Hub
+git clone https://github.com/Arturia169/0xRyan.Home-Hub.git
+cd 0xRyan.Home-Hub
 
 # 2. 配置环境变量
 cp .env.example .env
