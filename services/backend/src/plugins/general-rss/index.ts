@@ -3,7 +3,7 @@
  * 订阅任意 RSS/Atom 源
  */
 
-import { BasePlugin } from '../../core/BasePlugin.js';
+import { BasePlugin, USER_AGENT } from '../../core/BasePlugin.js';
 import { Subscription } from '../../core/types.js';
 import Parser from 'rss-parser';
 import {
@@ -23,7 +23,16 @@ export class GeneralRssPlugin extends BasePlugin {
 
     constructor() {
         super();
-        this.parser = new Parser();
+
+        const agent = this.getProxyAgent();
+        this.parser = new Parser({
+            requestOptions: {
+                headers: {
+                    'User-Agent': USER_AGENT
+                },
+                agent: agent
+            }
+        });
     }
 
     async addSubscription(userId: number, target: string, name?: string): Promise<any> {

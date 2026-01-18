@@ -3,7 +3,7 @@
  * 监控 GitHub 仓库 Release 发布
  */
 
-import { BasePlugin } from '../../core/BasePlugin.js';
+import { BasePlugin, USER_AGENT } from '../../core/BasePlugin.js';
 import { Subscription } from '../../core/types.js';
 import Parser from 'rss-parser';
 import {
@@ -27,13 +27,22 @@ interface GithubFeedItem {
 export class GithubPlugin extends BasePlugin {
     name = 'github';
     label = 'GitHub 监控';
-    interval = 30 * 60 * 1000; // 30分钟检查一次
+    interval = 15 * 60 * 1000; // 15分钟
 
     private parser: Parser;
 
     constructor() {
         super();
-        this.parser = new Parser();
+
+        const agent = this.getProxyAgent();
+        this.parser = new Parser({
+            requestOptions: {
+                headers: {
+                    'User-Agent': USER_AGENT
+                },
+                agent: agent
+            }
+        });
     }
 
     async addSubscription(userId: number, target: string, name?: string): Promise<any> {

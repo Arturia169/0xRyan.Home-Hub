@@ -10,6 +10,10 @@ import { sendMessage, sendPhoto } from '../services/notification.js';
 import { getDatabase } from '../database/index.js';
 import { setTimeout, setInterval, clearInterval } from 'node:timers';
 import type { Database } from 'better-sqlite3';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import config from '../config/index.js';
+
+export const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 export abstract class BasePlugin implements SourcePlugin {
     abstract name: string;
@@ -22,6 +26,16 @@ export abstract class BasePlugin implements SourcePlugin {
     constructor() {
         // 在子类构造函数中初始化 logger，名字暂时用 BasePlugin，子类应该覆盖
         this.log = logger.child('Plugin:Base');
+    }
+
+    /**
+     * 获取代理配置
+     */
+    protected getProxyAgent(): HttpsProxyAgent<string> | undefined {
+        if (config.proxyUrl) {
+            return new HttpsProxyAgent(config.proxyUrl);
+        }
+        return undefined;
     }
 
     // 初始化方法，子类必须调用 super.init() 或自行实现
