@@ -110,7 +110,7 @@ export function createBot(): Bot {
     });
 
     // 错误处理
-    bot.catch((err) => {
+    bot.catch((err: any) => {
         const ctx = err.ctx;
         log.error(`处理更新 ${ctx.update.update_id} 时出错:`, err.error);
 
@@ -177,7 +177,7 @@ export async function startBot(): Promise<void> {
 
     // 启动长轮询
     bot!.start({
-        onStart: (botInfo) => {
+        onStart: (botInfo: any) => {
             log.info(`Bot 已启动: @${botInfo.username}`);
         },
     });

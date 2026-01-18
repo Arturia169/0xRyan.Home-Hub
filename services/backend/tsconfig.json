@@ -4,7 +4,9 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "lib": [
-            "ESNext"
+            "ESNext",
+            "DOM",
+            "DOM.Iterable"
         ],
         "outDir": "./dist",
         "rootDir": "./src",

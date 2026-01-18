@@ -34,7 +34,7 @@ interface BilibiliLiveInfo {
 }
 
 export class BilibiliService {
-    private timer: any = null;
+    private timer: ReturnType<typeof setInterval> | null = null;
     private isRunning = false;
 
     /**
