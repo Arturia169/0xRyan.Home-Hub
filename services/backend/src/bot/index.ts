@@ -14,6 +14,7 @@ import { addYoutube, removeYoutube } from './commands/youtube.js';
 import { addTwitter, removeTwitter } from './commands/twitter.js';
 import { listAll } from './commands/list.js';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { pluginManager } from '../core/PluginManager.js';
 
 const log = logger.child('Bot');
 
@@ -98,6 +99,28 @@ export function createBot(): Bot {
     // 统一的订阅列表命令
     bot.command('list', listAll);
 
+    // RSS 命令 (托管给 PluginManager)
+    bot.command('addrss', async (ctx: Context) => {
+        if (!ctx.message?.text) return;
+        const parts = ctx.message.text.split(' ');
+        await pluginManager.handleAddCommand(ctx, 'rss', parts.slice(1));
+    });
+
+    bot.command('removerss', async (ctx: Context) => {
+        if (!ctx.message?.text) return;
+        const parts = ctx.message.text.split(' ');
+        if (parts.length < 2) return ctx.reply('⚠️ 用法: /removerss <URL>');
+
+        try {
+            const plugin = pluginManager.get('rss');
+            if (plugin && await plugin.removeSubscription(ctx.from!.id, parts[1])) {
+                await ctx.reply('✅ 删除成功');
+            } else {
+                await ctx.reply('❌ 删除失败或订阅不存在');
+            }
+        } catch (e: any) { ctx.reply(`❌ 错误: ${e.message}`); }
+    });
+
     // 错误处理
     bot.catch((err: any) => {
         const ctx = err.ctx;
@@ -128,6 +151,7 @@ export async function startBot(): Promise<void> {
         { command: 'start', description: '开始使用 / 主菜单' },
         { command: 'list', description: '查看所有订阅' },
         { command: 'addbili', description: '添加B站直播监控' },
+        { command: 'addrss', description: '添加RSS订阅' },
         { command: 'addyt', description: '添加YouTube频道监控' },
         { command: 'addtw', description: '添加Twitter用户监控' },
         { command: 'help', description: '帮助信息' },

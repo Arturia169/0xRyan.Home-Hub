@@ -140,14 +140,23 @@ export interface YoutubeChannel {
     created_at: string;
 }
 
-/**
- * Twitter/X 用户
- */
 export interface TwitterUser {
     id: number;
     user_id: number;
     username: string; // 这里的 username 是 handle (e.g. @elonmusk)
     name?: string;
     last_tweet_id?: string;
+    created_at: string;
+}
+
+/**
+ * 通用 RSS 订阅
+ */
+export interface RssFeed {
+    id: number;
+    user_id: number;
+    url: string;
+    name?: string;
+    last_hash?: string; // 用于记录最后一条内容的 Hash (或发布时间)
     created_at: string;
 }

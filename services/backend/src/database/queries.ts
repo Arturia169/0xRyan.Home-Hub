@@ -12,6 +12,7 @@ import type {
   CreateWalletParams,
   CreateAlertParams,
   BilibiliStreamer,
+  RssFeed,
 } from './models.js';
 import type { ChainType } from '../config/index.js';
 
@@ -585,4 +586,52 @@ export function updateTwitterUserStatus(
         SET last_tweet_id = ?
         WHERE id = ?
     `).run(lastTweetId, id);
+}
+
+// ==================== RSS 订阅操作 ====================
+
+/**
+ * 获取所有 RSS 订阅
+ */
+export function getAllRssFeeds(): (RssFeed & { telegram_id: number })[] {
+  const db = getDatabase();
+  return db.prepare(`
+        SELECT r.*, u.telegram_id 
+        FROM rss_feeds r
+        JOIN users u ON r.user_id = u.id
+    `).all() as (RssFeed & { telegram_id: number })[];
+}
+
+/**
+ * 添加 RSS 订阅
+ */
+export function addRssFeed(userId: number, url: string, name?: string): RssFeed {
+  const db = getDatabase();
+  const result = db.prepare(`
+        INSERT INTO rss_feeds (user_id, url, name)
+        VALUES (?, ?, ?)
+    `).run(userId, url, name || null);
+
+  return db.prepare('SELECT * FROM rss_feeds WHERE id = ?').get(result.lastInsertRowid) as RssFeed;
+}
+
+/**
+ * 移除 RSS 订阅
+ */
+export function removeRssFeed(userId: number, url: string): boolean {
+  const db = getDatabase();
+  const result = db.prepare(`
+        DELETE FROM rss_feeds WHERE user_id = ? AND url = ?
+    `).run(userId, url);
+  return result.changes > 0;
+}
+
+/**
+ * 更新 RSS 最后内容
+ */
+export function updateRssFeedHash(id: number, hash: string) {
+  const db = getDatabase();
+  db.prepare(`
+        UPDATE rss_feeds SET last_hash = ? WHERE id = ?
+    `).run(hash, id);
 }

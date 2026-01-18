@@ -57,6 +57,21 @@ export async function listAll(ctx: Context) {
         message += '\n';
     }
 
+    // RSS
+    try {
+        const rssPlugin = pluginManager.get('rss');
+        if (rssPlugin) {
+            const rssSubs = await rssPlugin.getSubscriptions(userId);
+            if (rssSubs.length > 0) {
+                message += '📰 <b>RSS 订阅 (' + rssSubs.length + ')</b>\n';
+                rssSubs.forEach((s, index) => {
+                    message += `${index + 1}. <a href="${s.targetId}">${s.name || 'RSS源'}</a>\n`;
+                });
+                message += '\n';
+            }
+        }
+    } catch (e) { console.error(e); }
+
     // Twitter
     if (twUsers.length > 0) {
         message += '🐦 <b>Twitter 用户 (' + twUsers.length + ')</b>\n';

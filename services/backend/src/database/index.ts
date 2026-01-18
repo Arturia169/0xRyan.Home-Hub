@@ -164,6 +164,20 @@ export function initDatabase(): void {
       )
     `);
 
+    // 创建通用 RSS 订阅表
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS rss_feeds (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        url TEXT NOT NULL,
+        name TEXT,
+        last_hash TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(user_id, url)
+      )
+    `);
+
     dbLogger.info('数据库表初始化完成');
   } catch (error) {
     dbLogger.error('数据库初始化失败:', error);
