@@ -135,6 +135,35 @@ export function initDatabase(): void {
       )
     `);
 
+    // 创建 YouTube 频道订阅表
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS youtube_channels (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        channel_id TEXT NOT NULL,
+        name TEXT,
+        last_video_id TEXT,
+        last_video_title TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(user_id, channel_id)
+      )
+    `);
+
+    // 创建 Twitter/X 用户订阅表
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS twitter_users (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        name TEXT,
+        last_tweet_id TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(user_id, username)
+      )
+    `);
+
     dbLogger.info('数据库表初始化完成');
   } catch (error) {
     dbLogger.error('数据库初始化失败:', error);

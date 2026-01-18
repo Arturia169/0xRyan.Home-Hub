@@ -126,3 +126,28 @@ export interface BilibiliStreamer {
     last_cover?: string;
     created_at: string;
 }
+
+/**
+ * YouTube 频道
+ */
+export interface YoutubeChannel {
+    id: number;
+    user_id: number;
+    channel_id: string;
+    name?: string;
+    last_video_id?: string;
+    last_video_title?: string;
+    created_at: string;
+}
+
+/**
+ * Twitter/X 用户
+ */
+export interface TwitterUser {
+    id: number;
+    user_id: number;
+    username: string; // 这里的 username 是 handle (e.g. @elonmusk)
+    name?: string;
+    last_tweet_id?: string;
+    created_at: string;
+}

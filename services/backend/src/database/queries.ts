@@ -453,3 +453,116 @@ export function updateBilibiliStreamerStatus(
         WHERE id = ?
     `).run(isLive, lastTitle || null, lastCover || null, id);
 }
+
+// ==================== YouTube 频道操作 ====================
+
+import type { YoutubeChannel } from './models.js';
+
+/**
+ * 添加 YouTube 订阅
+ */
+export function addYoutubeChannel(
+  userId: number,
+  channelId: string,
+  name?: string
+): YoutubeChannel {
+  const db = getDatabase();
+  const result = db.prepare(`
+        INSERT INTO youtube_channels (user_id, channel_id, name)
+        VALUES (?, ?, ?)
+    `).run(userId, channelId, name || null);
+  return db.prepare('SELECT * FROM youtube_channels WHERE id = ?').get(result.lastInsertRowid) as YoutubeChannel;
+}
+
+/**
+ * 移除 YouTube 订阅
+ */
+export function removeYoutubeChannel(userId: number, channelId: string): boolean {
+  const db = getDatabase();
+  const result = db.prepare('DELETE FROM youtube_channels WHERE user_id = ? AND channel_id = ?').run(userId, channelId);
+  return result.changes > 0;
+}
+
+/**
+ * 获取所有 YouTube 订阅
+ */
+export function getAllYoutubeChannels(): (YoutubeChannel & { telegram_id: number })[] {
+  const db = getDatabase();
+  return db.prepare(`
+        SELECT c.*, u.telegram_id 
+        FROM youtube_channels c
+        JOIN users u ON c.user_id = u.id
+    `).all() as (YoutubeChannel & { telegram_id: number })[];
+}
+
+/**
+ * 更新 YouTube 频道状态
+ */
+export function updateYoutubeChannelStatus(
+  id: number,
+  lastVideoId: string,
+  lastVideoTitle: string
+): void {
+  const db = getDatabase();
+  db.prepare(`
+        UPDATE youtube_channels 
+        SET last_video_id = ?, last_video_title = ?
+        WHERE id = ?
+    `).run(lastVideoId, lastVideoTitle, id);
+}
+
+// ==================== Twitter 用户操作 ====================
+
+import type { TwitterUser } from './models.js';
+
+/**
+ * 添加 Twitter 订阅
+ */
+export function addTwitterUser(
+  userId: number,
+  username: string,
+  name?: string
+): TwitterUser {
+  const db = getDatabase();
+  const result = db.prepare(`
+        INSERT INTO twitter_users (user_id, username, name)
+        VALUES (?, ?, ?)
+    `).run(userId, username, name || null);
+  return db.prepare('SELECT * FROM twitter_users WHERE id = ?').get(result.lastInsertRowid) as TwitterUser;
+}
+
+/**
+ * 移除 Twitter 订阅
+ */
+export function removeTwitterUser(userId: number, username: string): boolean {
+  const db = getDatabase();
+  const result = db.prepare('DELETE FROM twitter_users WHERE user_id = ? AND username = ?').run(userId, username);
+  return result.changes > 0;
+}
+
+/**
+ * 获取所有 Twitter 订阅
+ */
+export function getAllTwitterUsers(): (TwitterUser & { telegram_id: number })[] {
+  const db = getDatabase();
+  return db.prepare(`
+        SELECT t.*, u.telegram_id 
+        FROM twitter_users t
+        JOIN users u ON t.user_id = u.id
+    `).all() as (TwitterUser & { telegram_id: number })[];
+}
+
+/**
+ * 更新 Twitter 用户状态
+ */
+export function updateTwitterUserStatus(
+  id: number,
+  lastTweetId: string
+): void {
+  const db = getDatabase();
+  db.prepare(`
+        UPDATE twitter_users 
+        SET last_tweet_id = ?
+        WHERE id = ?
+    `).run(lastTweetId, id);
+}
