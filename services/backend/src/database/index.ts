@@ -47,22 +47,18 @@ export function initDatabase(): void {
         telegram_id INTEGER UNIQUE NOT NULL,
         username TEXT,
         first_name TEXT,
+        role TEXT DEFAULT 'user',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    // 创建用户表
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        telegram_id INTEGER UNIQUE NOT NULL,
-        username TEXT,
-        first_name TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    // 尝试添加 role 字段 (用于旧数据库迁移)
+    try {
+      db.prepare("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user'").run();
+    } catch (error) {
+      // 忽略错误 (字段已存在)
+    }
 
     // 创建 Bilibili 主播表
     db.exec(`
@@ -121,6 +117,20 @@ export function initDatabase(): void {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         UNIQUE(user_id, url)
+      )
+    `);
+
+    // 创建 GitHub 仓库监控表
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS github_repos (
+        id INTEGER PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        repo TEXT NOT NULL,
+        name TEXT,
+        last_release_tag TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(user_id, repo)
       )
     `);
 

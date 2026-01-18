@@ -9,7 +9,8 @@ import type {
   BilibiliStreamer,
   RssFeed,
   YoutubeChannel,
-  TwitterUser
+  TwitterUser,
+  GithubRepo
 } from './models.js';
 
 // ==================== 用户相关操作 ====================
@@ -46,6 +47,14 @@ export function getOrCreateUser(
   }
 
   return user;
+}
+
+/**
+ * 更新用户角色
+ */
+export function updateUserRole(telegramId: number, role: 'admin' | 'user' | 'guest') {
+  const db = getDatabase();
+  db.prepare('UPDATE users SET role = ? WHERE telegram_id = ?').run(role, telegramId);
 }
 
 /**
@@ -310,4 +319,52 @@ export function updateRssFeedHash(id: number, hash: string) {
   db.prepare(`
         UPDATE rss_feeds SET last_hash = ? WHERE id = ?
     `).run(hash, id);
+}
+
+// ==================== GitHub 仓库操作 ====================
+
+/**
+ * 获取所有 GitHub 订阅
+ */
+export function getAllGithubRepos(): (GithubRepo & { telegram_id: number })[] {
+  const db = getDatabase();
+  return db.prepare(`
+        SELECT g.*, u.telegram_id 
+        FROM github_repos g
+        JOIN users u ON g.user_id = u.id
+    `).all() as (GithubRepo & { telegram_id: number })[];
+}
+
+/**
+ * 添加 GitHub 订阅
+ */
+export function addGithubRepo(userId: number, repo: string, name?: string): GithubRepo {
+  const db = getDatabase();
+  const result = db.prepare(`
+        INSERT INTO github_repos (user_id, repo, name)
+        VALUES (?, ?, ?)
+    `).run(userId, repo, name || null);
+
+  return db.prepare('SELECT * FROM github_repos WHERE id = ?').get(result.lastInsertRowid) as GithubRepo;
+}
+
+/**
+ * 移除 GitHub 订阅
+ */
+export function removeGithubRepo(userId: number, repo: string): boolean {
+  const db = getDatabase();
+  const result = db.prepare(`
+        DELETE FROM github_repos WHERE user_id = ? AND repo = ?
+    `).run(userId, repo);
+  return result.changes > 0;
+}
+
+/**
+ * 更新 GitHub 仓库状态
+ */
+export function updateGithubRepoStatus(id: number, lastReleaseTag: string) {
+  const db = getDatabase();
+  db.prepare(`
+        UPDATE github_repos SET last_release_tag = ? WHERE id = ?
+    `).run(lastReleaseTag, id);
 }

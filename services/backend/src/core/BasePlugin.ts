@@ -4,6 +4,7 @@
  */
 
 import { SourcePlugin, Subscription } from './types.js';
+import { InlineKeyboard } from 'grammy';
 import { logger } from '../utils/logger.js';
 import { sendMessage, sendPhoto } from '../services/notification.js';
 import { getDatabase } from '../database/index.js';
@@ -57,17 +58,30 @@ export abstract class BasePlugin implements SourcePlugin {
     }
 
     // 通用通知方法
-    protected async notify(userId: number, message: string, photoUrl?: string) {
+    protected async notify(userId: number, message: string, photoUrl?: string, linkUrl?: string) {
         try {
+            // 构建内联键盘
+            const keyboard = new InlineKeyboard();
+
+            if (linkUrl) {
+                keyboard.url('🔗 查看详情', linkUrl).row();
+            }
+
+            // 添加删除按钮
+            keyboard.text('🗑️ 删除', 'delete_msg');
+
+            const options = {
+                parse_mode: 'HTML' as const,
+                reply_markup: keyboard
+            };
+
             if (photoUrl) {
                 await sendPhoto(userId, photoUrl, {
                     caption: message,
-                    parse_mode: 'HTML'
+                    ...options
                 });
             } else {
-                await sendMessage(userId, message, {
-                    parse_mode: 'HTML'
-                });
+                await sendMessage(userId, message, options);
             }
             this.log.info(`发送通知给用户 ${userId}`);
         } catch (error: any) {

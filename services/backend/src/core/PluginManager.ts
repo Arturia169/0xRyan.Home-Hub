@@ -9,6 +9,7 @@ import { BilibiliPlugin } from '../plugins/bilibili/index.js';
 import { GeneralRssPlugin } from '../plugins/general-rss/index.js';
 import { YoutubePlugin } from '../plugins/youtube/index.js';
 import { TwitterPlugin } from '../plugins/twitter/index.js';
+import { GithubPlugin } from '../plugins/github/index.js';
 
 const log = logger.child('Core:PluginManager');
 
@@ -21,6 +22,7 @@ export class PluginManager {
         this.register(new GeneralRssPlugin());
         this.register(new YoutubePlugin());
         this.register(new TwitterPlugin());
+        this.register(new GithubPlugin());
     }
 
     // 注册插件

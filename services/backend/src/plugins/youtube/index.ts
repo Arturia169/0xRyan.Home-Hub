@@ -123,6 +123,6 @@ export class YoutubePlugin extends BasePlugin {
 `;
         const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-        await this.notify(userId, message, thumbnailUrl);
+        await this.notify(userId, message, thumbnailUrl, video.link);
     }
 }

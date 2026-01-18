@@ -31,3 +31,15 @@ services:
       - HTTPS_PROXY=http://127.0.0.1:7890
       - TUNNEL_TRANSPORT_PROTOCOL=http2
     command: tunnel --no-autoupdate run --protocol http2
+
+  # 自动更新服务 - 每天检查一次镜像更新
+  watchtower:
+    image: containrrr/watchtower
+    container_name: cyber-watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true # 自动清理旧镜像
+      - WATCHTOWER_POLL_INTERVAL=3600 # 每1小时检查一次 (单位:秒)
+      - WATCHTOWER_INCLUDE_STOPPED=true
+    restart: unless-stopped

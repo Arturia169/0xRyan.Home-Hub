@@ -12,6 +12,7 @@ export interface User {
     telegram_id: number;
     username?: string;
     first_name?: string;
+    role: 'admin' | 'user' | 'guest'; // 默认 user
     created_at: string;
     updated_at: string;
 }
@@ -62,5 +63,17 @@ export interface RssFeed {
     url: string;
     name?: string;
     last_hash?: string; // 用于记录最后一条内容的 Hash (或发布时间)
+    created_at: string;
+}
+
+/**
+ * GitHub 仓库
+ */
+export interface GithubRepo {
+    id: number;
+    user_id: number;
+    repo: string; // owner/repo
+    name?: string;
+    last_release_tag?: string;
     created_at: string;
 }

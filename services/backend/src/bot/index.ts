@@ -13,6 +13,7 @@ import { addBili, removeBili } from './commands/bilibili.js';
 import { addYoutube, removeYoutube } from './commands/youtube.js';
 import { addTwitter, removeTwitter } from './commands/twitter.js';
 import { listAll } from './commands/list.js';
+import { listUsers, setRole } from './commands/admin/index.js';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { pluginManager } from '../core/PluginManager.js';
 
@@ -81,6 +82,21 @@ export function createBot(): Bot {
         }
     });
 
+    // 处理回调查询
+    bot.on('callback_query:data', async (ctx: Context, next) => {
+        if (ctx.callbackQuery?.data === 'delete_msg') {
+            try {
+                await ctx.deleteMessage();
+                await ctx.answerCallbackQuery({ text: '已删除' });
+            } catch (error) {
+                log.error('删除消息失败:', error);
+                await ctx.answerCallbackQuery({ text: '删除失败，消息可能已过期' });
+            }
+        } else {
+            await next();
+        }
+    });
+
     // 注册命令处理器
     bot.use(startCommand);
 
@@ -121,6 +137,32 @@ export function createBot(): Bot {
         } catch (e: any) { ctx.reply(`❌ 错误: ${e.message}`); }
     });
 
+    // GitHub 命令
+    bot.command('addgh', async (ctx: Context) => {
+        if (!ctx.message?.text) return;
+        const parts = ctx.message.text.split(' ');
+        await pluginManager.handleAddCommand(ctx, 'github', parts.slice(1));
+    });
+
+    bot.command('removegh', async (ctx: Context) => {
+        if (!ctx.message?.text) return;
+        const parts = ctx.message.text.split(' ');
+        if (parts.length < 2) return ctx.reply('⚠️ 用法: /removegh <owner/repo>');
+
+        try {
+            const plugin = pluginManager.get('github');
+            if (plugin && await plugin.removeSubscription(ctx.from!.id, parts[1])) {
+                await ctx.reply('✅ 删除成功');
+            } else {
+                await ctx.reply('❌ 删除失败或订阅不存在');
+            }
+        } catch (e: any) { ctx.reply(`❌ 错误: ${e.message}`); }
+    });
+
+    // 管理员命令
+    bot.command('admin_users', listUsers);
+    bot.command('setrole', setRole);
+
     // 错误处理
     bot.catch((err: any) => {
         const ctx = err.ctx;
@@ -154,6 +196,9 @@ export async function startBot(): Promise<void> {
         { command: 'addrss', description: '添加RSS订阅' },
         { command: 'addyt', description: '添加YouTube频道监控' },
         { command: 'addtw', description: '添加Twitter用户监控' },
+        { command: 'addgh', description: '添加GitHub仓库监控' },
+        { command: 'admin_users', description: '[Admin] 用户管理' },
+        { command: 'setrole', description: '[Admin] 修改权限' },
         { command: 'help', description: '帮助信息' },
     ]);
 

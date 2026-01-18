@@ -135,6 +135,6 @@ ${tweet.title}
 
 🔗 <a href="${twitterLink}">查看推文</a>
 `;
-        await this.notify(userId, message);
+        await this.notify(userId, message, undefined, twitterLink);
     }
 }

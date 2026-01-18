@@ -118,6 +118,6 @@ ${date ? `🕒 ${date}` : ''}
 <a href="${link}">👉 点击阅读原文</a>
 `;
         // 不发送图片，RSS 图片解析比较复杂且不稳定
-        await this.notify(sub.telegram_id, message);
+        await this.notify(sub.telegram_id, message, undefined, link);
     }
 }

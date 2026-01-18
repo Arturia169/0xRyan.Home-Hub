@@ -142,6 +142,6 @@ export class BilibiliPlugin extends BasePlugin {
 `;
 
         // 调用基类的 notify 方法
-        await this.notify(sub.telegram_id, message, info.user_cover);
+        await this.notify(sub.telegram_id, message, info.user_cover, `https://live.bilibili.com/${sub.room_id}`);
     }
 }
