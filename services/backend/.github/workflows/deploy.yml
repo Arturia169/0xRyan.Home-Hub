@@ -1,0 +1,56 @@
+name: Deploy to Server
+
+on:
+  workflow_run:
+    workflows: ["Build and Push to GHCR"]
+    types:
+      - completed
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: Deploy Application
+        run: |
+          cd /root/hbjk
+          
+          echo "🔄 拉取最新镜像..."
+          docker-compose pull
+          
+          echo "🚀 重启服务..."
+          docker-compose down
+          docker-compose up -d
+          
+          echo "🧹 清理旧镜像..."
+          docker image prune -f
+          
+          echo "✅ 部署完成！"
+          
+          # 等待服务启动
+          echo "⏳ 等待服务启动..."
+          sleep 15
+          
+          # 测试本地 API
+          echo "🔍 测试本地 API..."
+          curl -s http://localhost:3000/health || echo "❌ 本地 API 无响应"
+          
+          # 测试外部访问
+          echo "🌐 测试外部访问:"
+          curl -s https://app.yukinetwork.eu.org/health || echo "❌ 外部访问失败"
+          
+          # 打印日志
+          echo ""
+          echo "📝 Bot 容器日志:"
+          docker logs crypto-wallet-monitor --tail 30
+          
+          echo ""
+          echo "📝 Cloudflare Tunnel 日志:"
+          docker logs cloudflare-tunnel --tail 50
+          
+          echo ""
+          echo "📊 容器状态:"
+          docker-compose ps

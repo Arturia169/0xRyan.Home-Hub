@@ -1,0 +1,76 @@
+# ====================================
+# 虚拟钱包监控机器人 - Docker Compose 配置
+# 适用于 Debian 12 服务器部署
+# ====================================
+
+services:
+  # 机器人服务
+  wallet-monitor-bot:
+    # 从 GitHub Container Registry 拉取镜像
+    image: ghcr.io/arturia169/crypto-wallet-monitor:latest
+
+    # 容器名称
+    container_name: crypto-wallet-monitor
+
+    # 自动重启策略
+    restart: unless-stopped
+
+    # 使用 host 网络模式（可以访问宿主机的代理）
+    network_mode: host
+
+    # 环境变量（从 .env 文件读取）
+    env_file:
+      - .env
+
+    # 额外环境变量
+    environment:
+      - NODE_ENV=production
+      - TZ=Asia/Shanghai
+      - HTTP_PROXY=http://192.168.5.100:7890
+      - HTTPS_PROXY=http://192.168.5.100:7890
+      - http_proxy=http://192.168.5.100:7890
+      - https_proxy=http://192.168.5.100:7890
+      - NO_PROXY=localhost,127.0.0.1
+
+    # 提升权限以访问系统指标和 Docker Socket
+    privileged: true
+    user: root
+
+    # 数据卷挂载
+    volumes:
+      # 数据库持久化存储
+      - ./data:/app/data
+      # 挂载 Docker Socket 以监控其他容器
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # 健康检查
+    healthcheck:
+      test: [ "CMD", "node", "-e", "console.log('OK')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Cloudflare Tunnel 隧道服务 (提供 HTTPS)
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run --protocol http2
+    depends_on:
+      - wallet-monitor-bot
+
+# 定义网络（可选，如果需要与其他服务通信）
+networks:
+  default:
+    name: wallet-monitor-network

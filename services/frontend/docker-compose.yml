@@ -1,0 +1,14 @@
+services:
+  cyber-home:
+    image: ghcr.io/arturia169/0xryan.home:latest
+    build: .
+    container_name: cyber-home
+    ports:
+      - "1145:80"
+    restart: unless-stopped
+    networks:
+      - cyber-network
+
+networks:
+  cyber-network:
+    driver: bridge

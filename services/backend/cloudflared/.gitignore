@@ -1,0 +1,6 @@
+# 忽略敏感凭据文件
+credentials.json
+*.json
+
+# 只保留示例文件
+!*.example

@@ -1,0 +1,98 @@
+:root {
+  /* 高级配色 - 极致深色主题 */
+  --bg-main: #06060a;
+  --bg-card: rgba(13, 13, 20, 0.45);
+  --border-glass: rgba(255, 255, 255, 0.05);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* 精致霓虹色 - 降低饱和度，增加质感 */
+  --neon-cyan: #00e5ff;
+  --neon-purple: #9d50bb;
+  --neon-pink: #ff00cc;
+  --neon-green: #00ff87;
+  --neon-orange: #ff9d00;
+  --neon-red: #ff4d4d;
+
+  /* 多层发光阴影 - 创造深度感 */
+  --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.15), 0 0 40px rgba(0, 229, 255, 0.05);
+  --glow-purple: 0 0 20px rgba(157, 80, 187, 0.15), 0 0 40px rgba(157, 80, 187, 0.05);
+
+  /* 高级渐变 */
+  --grad-premium: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+  --grad-cyan: linear-gradient(135deg, #00e5ff 0%, #12a7e9 100%);
+  --grad-purple: linear-gradient(135deg, #9d50bb 0%, #6e48aa 100%);
+
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow: hidden;
+  /* 颗粒感背景 */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 10% 10%, rgba(0, 229, 255, 0.03) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(157, 80, 187, 0.03) 0%, transparent 40%);
+  background-blend-mode: overlay;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+}
+
+/* 极致磨砂卡片 */
+.cyber-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-glass);
+  border-radius: 24px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--grad-premium);
+  pointer-events: none;
+}
+
+.cyber-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 20px 60px -15px rgba(0, 0, 0, 0.7);
+}
+
+/* 扫视线 & 氛围网格 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+  background-size: 100% 4px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.15;
+}

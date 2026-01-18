@@ -1,0 +1,45 @@
+{
+    "name": "cyber-base-core",
+    "version": "2.0.0",
+    "description": "赛博基地情报中心 - B站/YouTube/社媒情报聚合与推送",
+    "main": "dist/index.js",
+    "type": "module",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "tsx watch src/index.ts",
+        "test": "vitest"
+    },
+    "keywords": [
+        "telegram",
+        "bot",
+        "intelligence",
+        "monitor",
+        "bilibili",
+        "youtube",
+        "social-media"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+        "grammy": "^1.21.1",
+        "better-sqlite3": "^9.2.2",
+        "dotenv": "^16.3.1",
+        "axios": "^1.6.2",
+        "fastify": "^4.24.3",
+        "@fastify/static": "^6.12.0",
+        "@fastify/cors": "^8.4.1",
+        "systeminformation": "^5.21.22",
+        "rss-parser": "^3.13.0"
+    },
+    "devDependencies": {
+        "@types/better-sqlite3": "^7.6.8",
+        "@types/node": "^20.10.4",
+        "tsx": "^4.6.2",
+        "typescript": "^5.3.3",
+        "vitest": "^1.1.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
