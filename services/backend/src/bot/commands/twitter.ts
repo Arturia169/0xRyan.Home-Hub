@@ -3,11 +3,7 @@
  */
 
 import { Context } from 'grammy';
-import {
-    addTwitterUser,
-    removeTwitterUser,
-    getAllTwitterUsers
-} from '../../database/queries.js';
+import { pluginManager } from '../../core/PluginManager.js';
 import { logger } from '../../utils/logger.js';
 
 const log = logger.child('Bot:Twitter');
@@ -26,7 +22,7 @@ export async function addTwitter(ctx: Context) {
     }
 
     let username = args[0];
-    // 确保有 @ 前缀 (虽然查询时可以去掉，但为了显示统一)
+    // 确保有 @ 前缀
     if (!username.startsWith('@')) {
         username = '@' + username;
     }
@@ -35,7 +31,10 @@ export async function addTwitter(ctx: Context) {
     const userId = ctx.from!.id;
 
     try {
-        addTwitterUser(userId, username, name);
+        const plugin = pluginManager.get('twitter');
+        if (!plugin) return ctx.reply('❌ 插件未加载');
+
+        await plugin.addSubscription(userId, username, name);
         await ctx.reply(`✅ 成功订阅 Twitter 用户: <b>${name}</b>\n帐号: <code>${username}</code>`, { parse_mode: 'HTML' });
         log.info(`用户 ${userId} 添加 Twitter 订阅: ${username}`);
     } catch (error: any) {
@@ -63,7 +62,10 @@ export async function removeTwitter(ctx: Context) {
     const userId = ctx.from!.id;
 
     try {
-        const success = removeTwitterUser(userId, username);
+        const plugin = pluginManager.get('twitter');
+        if (!plugin) return ctx.reply('❌ 插件未加载');
+
+        const success = await plugin.removeSubscription(userId, username);
         if (success) {
             await ctx.reply(`🗑️ 已取消订阅 Twitter 用户: ${username}`);
         } else {
@@ -79,19 +81,25 @@ export async function removeTwitter(ctx: Context) {
  */
 export async function listTwitter(ctx: Context) {
     const userId = ctx.from!.id;
-    const users = getAllTwitterUsers().filter(u => u.telegram_id === userId);
 
-    if (users.length === 0) {
-        await ctx.reply('📭 你还没有订阅任何 Twitter 用户');
-        return;
-    }
+    try {
+        const plugin = pluginManager.get('twitter');
+        if (!plugin) return;
 
-    let message = '🐦 <b>Twitter 订阅列表:</b>\n\n';
-    users.forEach((u, index) => {
-        message += `${index + 1}. <b>${u.name || u.username}</b>\n`;
-        message += `   Handle: <code>${u.username}</code>\n`;
-        message += '\n';
-    });
+        const users = await plugin.getSubscriptions(userId);
 
-    await ctx.reply(message, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
+        if (users.length === 0) {
+            await ctx.reply('📭 你还没有订阅任何 Twitter 用户');
+            return;
+        }
+
+        let message = '🐦 <b>Twitter 订阅列表:</b>\n\n';
+        users.forEach((u, index) => {
+            message += `${index + 1}. <b>${u.name || u.targetId}</b>\n`;
+            message += `   Handle: <code>${u.targetId}</code>\n`;
+            message += '\n';
+        });
+
+        await ctx.reply(message, { parse_mode: 'HTML', link_preview_options: { is_disabled: true } });
+    } catch (e) { console.error(e); }
 }
